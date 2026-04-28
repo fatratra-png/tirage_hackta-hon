@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NUIT BLANCHE - Tirage au Sort</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1a1a2e;
+      --accent: #ff3366;
+      --gold: #ffd700;
+      --light: #f0e6d2;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: white;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 3.2rem;
+      margin-bottom: 20px;
+      background: linear-gradient(90deg, #ffd700, #ff3366, #ffd700);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px rgba(255, 51, 102, 0.5);
+    }
+
+    .urn-container {
+      position: relative;
+      width: 420px;
+      height: 420px;
+      margin: 0 auto 40px;
+    }
+
+    .urne {
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 40% 30%, #4a2c0b, #1c1105 60%, #0f0803);
+      border-radius: 50% 50% 40% 40%;
+      box-shadow: 
+        inset 0 40px 60px rgba(255,255,255,0.1),
+        inset 0 -40px 60px rgba(0,0,0,0.8),
+        0 20px 40px rgba(0,0,0,0.9);
+      border: 12px solid #ffd700;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .urne::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 180px;
+      height: 180px;
+      background: radial-gradient(circle, rgba(255,215,0,0.3), transparent);
+      border-radius: 50%;
+    }
+
+    .balls-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 300px;
+      height: 300px;
+      transform: translate(-50%, -50%);
+    }
+
+    .ball {
+      position: absolute;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+      box-shadow: 
+        inset 0 -10px 15px rgba(0,0,0,0.4),
+        0 8px 15px rgba(0,0,0,0.5);
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .result {
+      margin-top: 30px;
+      min-height: 280px;
+    }
+
+    .order-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .order-item {
+      background: rgba(255,255,255,0.1);
+      padding: 16px 24px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      font-size: 1.4rem;
+      font-weight: 600;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 215, 0, 0.3);
+    }
+
+    .order-number {
+      width: 45px;
+      height: 45px;
+      background: var(--gold);
+      color: #1a1a2e;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 16px 40px;
+      font-size: 1.3rem;
+      font-weight: 700;
+      background: linear-gradient(45deg, #ff3366, #ff6699);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(255, 51, 102, 0.4);
+      transition: all 0.3s;
+    }
+
+    button:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 35px rgba(255, 51, 102, 0.6);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>NUIT BLANCHE</h1>
+    <p style="font-size:1.3rem; margin-bottom:30px; opacity:0.9;">Tirage au sort - Ordre de passage</p>
+
+    <div class="urn-container">
+      <div class="urne" id="urne">
+        <div class="balls-container" id="ballsContainer"></div>
+      </div>
+    </div>
+
+    <button id="drawBtn">LANCER LE TIRAGE</button>
+
+    <div class="result" id="result">
+      <div class="order-list" id="orderList"></div>
+    </div>
+  </div>
+
+  <!-- Audio -->
+  <audio id="rouletteSound" src="https://freesound.org/data/previews/202/202672_3248244-lq.mp3"></audio>
+  <audio id="ballOutSound" src="https://freesound.org/data/previews/387/387186_5121236-lq.mp3"></audio>
+  <audio id="ballHitSound" src="https://freesound.org/data/previews/276/276951_5123853-lq.mp3"></audio>
+
+  <script>
+    const teams = [
+      "PoOpOverflow",
+      "Hackode",
+      "0nlyDevs",
+      "Kawaii Squad",
+      "ultimate",
+      "CLAUDE A6"
+    ];
+
+    let remainingTeams = [...teams];
+    let order = [];
+    let isDrawing = false;
+
+    const ballsContainer = document.getElementById('ballsContainer');
+    const drawBtn = document.getElementById('drawBtn');
+    const orderList = document.getElementById('orderList');
+
+    // Couleurs inspirées de l'image (rose/orange/violet/bleu)
+    const colors = [
+      '#ff3366', '#ff6699', '#cc0066', 
+      '#ff9933', '#ffcc00', '#9966ff'
+    ];
+
+    function createBalls() {
+      ballsContainer.innerHTML = '';
+      remainingTeams.forEach((team, index) => {
+        const ball = document.createElement('div');
+        ball.className = 'ball';
+        ball.style.backgroundColor = colors[index % colors.length];
+        ball.style.left = `${Math.random() * 70 + 15}%`;
+        ball.style.top = `${Math.random() * 70 + 15}%`;
+        ball.textContent = team.substring(0, 3).toUpperCase();
+        ball.title = team;
+        ballsContainer.appendChild(ball);
+      });
+    }
+
+    function animateRoulette() {
+      const balls = document.querySelectorAll('.ball');
+      gsap.to(balls, {
+        rotation: 360 * 8 + Math.random() * 360,
+        duration: 4.5,
+        ease: "power2.inOut",
+        stagger: 0.05
+      });
+
+      gsap.to(balls, {
+        x: () => Math.random() * 200 - 100,
+        y: () => Math.random() * 200 - 100,
+        duration: 4.5,
+        ease: "power2.inOut",
+        stagger: 0.05
+      });
+    }
+
+    async function drawOneBall() {
+      if (remainingTeams.length === 0 || isDrawing) return;
+
+      isDrawing = true;
+      drawBtn.disabled = true;
+
+      // Son de roulette
+      document.getElementById('rouletteSound').play();
+
+      animateRoulette();
+
+      // Attendre la fin de l'animation
+      await new Promise(resolve => setTimeout(resolve, 4800));
+
+      // Tirage aléatoire
+      const randomIndex = Math.floor(Math.random() * remainingTeams.length);
+      const selectedTeam = remainingTeams[randomIndex];
+
+      // Retirer l'équipe
+      remainingTeams.splice(randomIndex, 1);
+
+      // Ajouter à l'ordre
+      order.push(selectedTeam);
+
+      // Animation de sortie de balle
+      document.getElementById('ballOutSound').play();
+
+      // Créer la ligne dans le résultat
+      const item = document.createElement('div');
+      item.className = 'order-item';
+      item.innerHTML = `
+        <div class="order-number">${order.length}</div>
+        <span>${selectedTeam}</span>
+      `;
+      orderList.appendChild(item);
+
+      // Animation d'apparition
+      gsap.from(item, {
+        opacity: 0,
+        x: -100,
+        duration: 0.8,
+        ease: "back.out(1.4)"
+      });
+
+      // Son de balle qui tombe
+      setTimeout(() => {
+        document.getElementById('ballHitSound').play();
+      }, 300);
+
+      // Réinitialiser les boules restantes
+      if (remainingTeams.length > 0) {
+        createBalls();
+        drawBtn.textContent = `CONTINUER LE TIRAGE (${remainingTeams.length} restantes)`;
+        drawBtn.disabled = false;
+      } else {
+        drawBtn.textContent = "Tirage terminé !";
+        drawBtn.style.background = "linear-gradient(45deg, #00cc66, #33ff99)";
+      }
+
+      isDrawing = false;
+    }
+
+    // Initialisation
+    function init() {
+      createBalls();
+      orderList.innerHTML = '';
+      remainingTeams = [...teams];
+      order = [];
+      drawBtn.textContent = "LANCER LE TIRAGE";
+      drawBtn.disabled = false;
+    }
+
+    drawBtn.addEventListener('click', drawOneBall);
+
+    // Lancement initial
+    window.onload = init;
+  </script>
+</body>
+</html>

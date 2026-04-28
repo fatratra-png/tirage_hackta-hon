@@ -1,331 +1,831 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NUIT BLANCHE - Tirage au Sort</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --primary: #1a1a2e;
-      --accent: #ff3366;
-      --gold: #ffd700;
-      --light: #f0e6d2;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NUIT BLANCHE — Tirage au sort</title>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:   #001a35;
+  --navy2:  #002244;
+  --navy3:  #003366;
+  --gold:   #f7c948;
+  --gold2:  #e6a800;
+  --red:    #e63946;
+  --white:  #ffffff;
+  --glass:  rgba(255,255,255,0.07);
+  --border: rgba(247,201,72,0.25);
+}
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+* { margin:0; padding:0; box-sizing:border-box; }
 
-    body {
-      font-family: 'Quicksand', sans-serif;
-      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-      color: white;
-      height: 100vh;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+body {
+  font-family: 'Quicksand', sans-serif;
+  background: var(--navy);
+  min-height: 100vh;
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+}
 
-    .container {
-      text-align: center;
-    }
+/* ── BACKGROUND ─────────────────────────────── */
+.bg {
+  position: fixed; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 10%, rgba(0,50,120,0.5) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 60% at 80% 90%, rgba(230,57,70,0.12) 0%, transparent 60%),
+    var(--navy);
+}
+.star { position:fixed; background:#fff; border-radius:50%; animation: tw var(--d,2s) infinite alternate; }
+@keyframes tw { from{opacity:.1} to{opacity:.7} }
 
-    h1 {
-      font-size: 3.2rem;
-      margin-bottom: 20px;
-      background: linear-gradient(90deg, #ffd700, #ff3366, #ffd700);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 30px rgba(255, 51, 102, 0.5);
-    }
+/* ── LAYOUT ──────────────────────────────────── */
+.wrap {
+  position: relative; z-index: 1;
+  width: 100%; max-width: 860px;
+  padding: 32px 20px 48px;
+  display: flex; flex-direction: column; align-items: center; gap: 28px;
+}
 
-    .urn-container {
-      position: relative;
-      width: 420px;
-      height: 420px;
-      margin: 0 auto 40px;
-    }
+/* ── HEADER ──────────────────────────────────── */
+header { text-align:center; }
+header h1 {
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  text-shadow: 0 0 40px rgba(247,201,72,0.4);
+}
+header p {
+  margin-top: 6px;
+  font-size: .85rem; font-weight: 500;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+}
 
-    .urne {
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at 40% 30%, #4a2c0b, #1c1105 60%, #0f0803);
-      border-radius: 50% 50% 40% 40%;
-      box-shadow: 
-        inset 0 40px 60px rgba(255,255,255,0.1),
-        inset 0 -40px 60px rgba(0,0,0,0.8),
-        0 20px 40px rgba(0,0,0,0.9);
-      border: 12px solid #ffd700;
-      overflow: hidden;
-      position: relative;
-    }
+/* ── MAIN STAGE ──────────────────────────────── */
+.stage {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  width: 100%;
+}
+@media(max-width:600px){ .stage{ grid-template-columns:1fr; } }
 
-    .urne::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 180px;
-      height: 180px;
-      background: radial-gradient(circle, rgba(255,215,0,0.3), transparent);
-      border-radius: 50%;
-    }
+/* ── URN ─────────────────────────────────────── */
+.urn-panel {
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px 16px;
+}
+.panel-label {
+  font-size: .7rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+}
 
-    .balls-container {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 300px;
-      height: 300px;
-      transform: translate(-50%, -50%);
-    }
+.urn-body {
+  position: relative;
+  width: 200px; height: 220px;
+}
+.urn-svg { width:100%; height:100%; }
 
-    .ball {
-      position: absolute;
-      width: 58px;
-      height: 58px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 13px;
-      color: white;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.6);
-      box-shadow: 
-        inset 0 -10px 15px rgba(0,0,0,0.4),
-        0 8px 15px rgba(0,0,0,0.5);
-      cursor: pointer;
-      transition: transform 0.3s;
-    }
+/* Boules dans l'urne */
+.urn-balls {
+  position: absolute;
+  bottom: 52px; left: 50%; transform: translateX(-50%);
+  width: 160px; height: 110px;
+  display: flex; flex-wrap: wrap;
+  align-items: flex-end; justify-content: center;
+  gap: 5px; padding: 8px;
+  pointer-events: none;
+}
+.ub {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffffff 0%, #ccd8e8 55%, #a0b4cc 100%);
+  box-shadow:
+    inset -3px -4px 8px rgba(0,0,0,0.25),
+    inset 3px 3px 6px rgba(255,255,255,0.8),
+    0 2px 6px rgba(0,0,0,0.4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 6.5px; font-weight: 700;
+  color: var(--navy);
+  line-height: 1.1; text-align: center; padding: 2px;
+  animation: bob var(--dur, 2s) ease-in-out infinite alternate;
+  transition: opacity .4s, transform .4s;
+}
+.ub::after {
+  content:''; position:absolute;
+  width:9px; height:5px;
+  background:rgba(255,255,255,0.5);
+  border-radius:50%; top:7px; left:9px;
+  pointer-events:none;
+}
+@keyframes bob {
+  from { transform: translateY(0) rotate(-3deg); }
+  to   { transform: translateY(-5px) rotate(3deg); }
+}
 
-    .result {
-      margin-top: 30px;
-      min-height: 280px;
-    }
+/* ── ROULETTE PANEL ──────────────────────────── */
+.wheel-panel {
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px 16px;
+}
 
-    .order-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      max-width: 500px;
-      margin: 0 auto;
-    }
+.wheel-wrapper {
+  position: relative;
+  width: 220px; height: 220px;
+  display: flex; align-items: center; justify-content: center;
+}
+#wheelCanvas {
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 4px var(--navy2),
+    0 0 0 7px var(--gold2),
+    0 0 40px rgba(247,201,72,0.3);
+  display: block;
+}
+.needle {
+  position: absolute; top: -4px; left: 50%;
+  transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 28px solid var(--gold);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+  z-index: 5;
+}
 
-    .order-item {
-      background: rgba(255,255,255,0.1);
-      padding: 16px 24px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      font-size: 1.4rem;
-      font-weight: 600;
-      backdrop-filter: blur(10px);
-      border: 2px solid rgba(255, 215, 0, 0.3);
-    }
+/* ── OUTPUT SECTION ──────────────────────────── */
+.output-section {
+  width: 100%;
+  display: flex; flex-direction: column; align-items: center; gap: 18px;
+}
 
-    .order-number {
-      width: 45px;
-      height: 45px;
-      background: var(--gold);
-      color: #1a1a2e;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.6rem;
-      font-weight: 700;
-    }
+/* Grande boule sortante */
+.big-ball-wrap {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  min-height: 180px;
+}
+.big-ball {
+  width: 150px; height: 150px; border-radius: 50%;
+  background: radial-gradient(circle at 33% 28%, #ffffff 0%, #d4e2f0 45%, #aabdd4 75%, #8aaac2 100%);
+  box-shadow:
+    inset -14px -14px 28px rgba(0,0,0,0.22),
+    inset 10px 10px 20px rgba(255,255,255,0.85),
+    0 8px 32px rgba(0,0,0,0.5),
+    0 0 0 3px rgba(255,255,255,0.15);
+  display: flex; align-items: center; justify-content: center;
+  text-align: center; padding: 14px;
+  font-size: 1rem; font-weight: 700;
+  color: var(--navy);
+  position: relative;
+  opacity: 0;
+  transform: scale(.3) translateY(50px);
+  transition: opacity .05s, transform .05s;
+}
+.big-ball::after {
+  content:''; position:absolute;
+  width:42px; height:22px;
+  background:rgba(255,255,255,0.45);
+  border-radius:50%; top:26px; left:30px;
+}
+.big-ball.pop {
+  animation: ballPop .7s cubic-bezier(.175,.885,.32,1.275) forwards;
+}
+@keyframes ballPop {
+  0%   { opacity:0; transform:scale(.3) translateY(50px); }
+  65%  { opacity:1; transform:scale(1.12) translateY(-8px); }
+  100% { opacity:1; transform:scale(1) translateY(0); }
+}
+.ball-order-tag {
+  font-size:.75rem; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  color:var(--gold); opacity:0; transition:opacity .4s;
+}
+.ball-order-tag.show { opacity:1; }
 
-    button {
-      margin-top: 20px;
-      padding: 16px 40px;
-      font-size: 1.3rem;
-      font-weight: 700;
-      background: linear-gradient(45deg, #ff3366, #ff6699);
-      color: white;
-      border: none;
-      border-radius: 50px;
-      cursor: pointer;
-      box-shadow: 0 10px 25px rgba(255, 51, 102, 0.4);
-      transition: all 0.3s;
-    }
+/* ── CONTROLS ────────────────────────────────── */
+.controls { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
 
-    button:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 15px 35px rgba(255, 51, 102, 0.6);
-    }
+.btn-main {
+  padding: 14px 42px;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1rem; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
+  color: var(--navy);
+  border: none; border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(247,201,72,0.35), 0 2px 8px rgba(0,0,0,0.4);
+  transition: transform .15s, box-shadow .15s;
+}
+.btn-main:hover  { transform:translateY(-2px); box-shadow:0 8px 28px rgba(247,201,72,0.55); }
+.btn-main:active { transform:scale(.97); }
+.btn-main:disabled { opacity:.4; cursor:not-allowed; transform:none; }
 
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-  </style>
+.btn-sec {
+  padding: 12px 28px;
+  font-family: 'Quicksand', sans-serif;
+  font-size: .9rem; font-weight: 600;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  background: transparent;
+  color: rgba(255,255,255,.45);
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all .2s;
+  display: none;
+}
+.btn-sec:hover { color:#fff; border-color:rgba(255,255,255,.4); background:rgba(255,255,255,.06); }
+
+.status {
+  font-size: .88rem; font-weight: 600; letter-spacing: 1px;
+  color: rgba(255,255,255,.5);
+  min-height: 20px; text-align: center;
+}
+
+/* ── RESULTS ─────────────────────────────────── */
+.results-wrap {
+  width: 100%; max-width: 480px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.r-item {
+  display: flex; align-items: center; gap: 14px;
+  background: rgba(0,34,68,0.7);
+  border: 1px solid rgba(247,201,72,0.15);
+  border-radius: 50px;
+  padding: 10px 20px;
+  opacity: 0; transform: translateX(-30px);
+  transition: opacity .45s, transform .45s;
+}
+.r-item.in { opacity:1; transform:translateX(0); }
+.r-pos {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  display: flex; align-items: center; justify-content: center;
+  font-size: .78rem; font-weight: 700; color: var(--navy);
+  flex-shrink: 0;
+}
+.r-dot {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff 0%, #b0c8e0 60%, #8aaac2 100%);
+  box-shadow: inset -2px -2px 5px rgba(0,0,0,0.2), inset 2px 2px 4px rgba(255,255,255,.7);
+  flex-shrink: 0;
+}
+.r-name { font-size: .95rem; font-weight: 700; color: #fff; }
+
+/* ── FINALE ──────────────────────────────────── */
+.finale {
+  display: none;
+  padding: 16px 36px;
+  background: rgba(247,201,72,0.1);
+  border: 1px solid rgba(247,201,72,0.45);
+  border-radius: 16px;
+  text-align: center;
+  font-size: 1.1rem; font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 2px;
+  animation: glow 2s ease-in-out infinite;
+}
+@keyframes glow {
+  0%,100%{ box-shadow:0 0 20px rgba(247,201,72,.2); }
+  50%    { box-shadow:0 0 40px rgba(247,201,72,.5); }
+}
+
+/* divider */
+hr { border:none; border-top:1px solid rgba(255,255,255,.08); width:100%; }
+</style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>NUIT BLANCHE</h1>
-    <p style="font-size:1.3rem; margin-bottom:30px; opacity:0.9;">Tirage au sort - Ordre de passage</p>
+<div class="bg" id="bgStars"></div>
 
-    <div class="urn-container">
-      <div class="urne" id="urne">
-        <div class="balls-container" id="ballsContainer"></div>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header>
+    <h1>✦ Nuit Blanche ✦</h1>
+    <p>Tirage de l'ordre de passage</p>
+  </header>
+
+  <!-- STAGE: URN + WHEEL -->
+  <div class="stage">
+
+    <!-- URN -->
+    <div class="urn-panel">
+      <span class="panel-label">Urne</span>
+      <div class="urn-body">
+        <!-- SVG urne -->
+        <svg class="urn-svg" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="uG" cx="32%" cy="28%">
+              <stop offset="0%"   stop-color="#004488"/>
+              <stop offset="55%"  stop-color="#001e44"/>
+              <stop offset="100%" stop-color="#000e22"/>
+            </radialGradient>
+            <radialGradient id="uR" cx="30%" cy="25%">
+              <stop offset="0%"  stop-color="rgba(130,190,240,0.22)"/>
+              <stop offset="100%" stop-color="rgba(0,30,70,0.05)"/>
+            </radialGradient>
+          </defs>
+          <!-- socle -->
+          <rect x="55" y="195" width="90" height="15" rx="5"
+            fill="#001533" stroke="#f7c948" stroke-width="1.2"/>
+          <ellipse cx="100" cy="210" rx="55" ry="10"
+            fill="#000e22" stroke="#f7c948" stroke-width="1"/>
+          <!-- corps -->
+          <path d="M42 185 Q28 130 38 78 Q50 32 100 26 Q150 32 162 78 Q172 130 158 185 Z"
+            fill="url(#uG)" stroke="#1a4a80" stroke-width="1.5"/>
+          <path d="M42 185 Q28 130 38 78 Q50 32 100 26 Q150 32 162 78 Q172 130 158 185 Z"
+            fill="url(#uR)"/>
+          <!-- reflets -->
+          <path d="M58 150 Q50 110 60 70 Q68 48 84 38"
+            stroke="rgba(160,215,255,0.18)" stroke-width="7"
+            fill="none" stroke-linecap="round"/>
+          <!-- lèvre haute -->
+          <ellipse cx="100" cy="26" rx="62" ry="14"
+            fill="#001533" stroke="#f7c948" stroke-width="1.5"/>
+          <ellipse cx="100" cy="26" rx="52" ry="9"
+            fill="#000e22" stroke="#1a5a9a" stroke-width=".8"/>
+          <!-- lèvre basse -->
+          <path d="M42 185 Q40 193 48 198 L152 198 Q160 193 158 185 Z"
+            fill="#001533" stroke="#f7c948" stroke-width="1.2"/>
+          <!-- deco -->
+          <text x="100" y="178" text-anchor="middle"
+            font-family="Quicksand,sans-serif" font-size="10" font-weight="700"
+            fill="rgba(247,201,72,0.5)" letter-spacing="3">LOTO</text>
+          <text x="58"  y="110" font-size="10" fill="rgba(247,201,72,0.3)">★</text>
+          <text x="138" y="98"  font-size="8"  fill="rgba(247,201,72,0.25)">✦</text>
+        </svg>
+        <!-- boules flottantes -->
+        <div class="urn-balls" id="urnBalls"></div>
       </div>
     </div>
 
-    <button id="drawBtn">LANCER LE TIRAGE</button>
-
-    <div class="result" id="result">
-      <div class="order-list" id="orderList"></div>
+    <!-- ROULETTE -->
+    <div class="wheel-panel">
+      <span class="panel-label">Roulette</span>
+      <div class="wheel-wrapper">
+        <div class="needle" id="needle"></div>
+        <canvas id="wheelCanvas" width="220" height="220"></canvas>
+      </div>
     </div>
+
+  </div><!-- /stage -->
+
+  <!-- BOULE SORTANTE -->
+  <div class="output-section">
+    <div class="big-ball-wrap">
+      <span class="ball-order-tag" id="orderTag"></span>
+      <div class="big-ball" id="bigBall"></div>
+    </div>
+
+    <p class="status" id="status">6 équipes dans l'urne · Lancez le tirage !</p>
+
+    <div class="controls">
+      <button class="btn-main" id="btnDraw">🎱 Lancer le tirage</button>
+      <button class="btn-sec"  id="btnReset">↺ Recommencer</button>
+    </div>
+
+    <div class="finale" id="finale">🎉 Ordre de passage établi ! 🎉</div>
   </div>
 
-  <!-- Audio -->
-  <audio id="rouletteSound" src="https://freesound.org/data/previews/202/202672_3248244-lq.mp3"></audio>
-  <audio id="ballOutSound" src="https://freesound.org/data/previews/387/387186_5121236-lq.mp3"></audio>
-  <audio id="ballHitSound" src="https://freesound.org/data/previews/276/276951_5123853-lq.mp3"></audio>
+  <hr>
 
-  <script>
-    const teams = [
-      "PoOpOverflow",
-      "Hackode",
-      "0nlyDevs",
-      "Kawaii Squad",
-      "ultimate",
-      "CLAUDE A6"
-    ];
+  <!-- RÉSULTATS -->
+  <div class="results-wrap" id="results"></div>
 
-    let remainingTeams = [...teams];
-    let order = [];
-    let isDrawing = false;
+</div><!-- /wrap -->
 
-    const ballsContainer = document.getElementById('ballsContainer');
-    const drawBtn = document.getElementById('drawBtn');
-    const orderList = document.getElementById('orderList');
+<script>
+/* ═══════════════════════════════════════════════
+   DONNÉES
+═══════════════════════════════════════════════ */
+const TEAMS = [
+  "PoOpOverflow",
+  "Hackode",
+  "0nlyDevs",
+  "Kawaii Squad",
+  "ultimate",
+  "CLAUDE A6"
+];
 
-    // Couleurs inspirées de l'image (rose/orange/violet/bleu)
-    const colors = [
-      '#ff3366', '#ff6699', '#cc0066', 
-      '#ff9933', '#ffcc00', '#9966ff'
-    ];
+/* Couleurs roulette : palette logo (navy / gold / red) */
+const WHEEL_COLORS = [
+  "#001a35",  // navy profond
+  "#002f6c",  // navy moyen
+  "#003d8a",  // navy clair
+  "#e63946",  // rouge logo
+  "#c0392b",  // rouge foncé
+  "#00224d",  // navy-indigo
+];
 
-    function createBalls() {
-      ballsContainer.innerHTML = '';
-      remainingTeams.forEach((team, index) => {
-        const ball = document.createElement('div');
-        ball.className = 'ball';
-        ball.style.backgroundColor = colors[index % colors.length];
-        ball.style.left = `${Math.random() * 70 + 15}%`;
-        ball.style.top = `${Math.random() * 70 + 15}%`;
-        ball.textContent = team.substring(0, 3).toUpperCase();
-        ball.title = team;
-        ballsContainer.appendChild(ball);
-      });
+/* ═══════════════════════════════════════════════
+   ÉTAT
+═══════════════════════════════════════════════ */
+let pool      = [];   // équipes restantes (indices dans TEAMS)
+let drawOrder = [];   // ordre de tirage [{teamIndex, pos}]
+let busy      = false;
+
+/* ═══════════════════════════════════════════════
+   AUDIO
+═══════════════════════════════════════════════ */
+let actx = null;
+function getACtx() {
+  if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+  return actx;
+}
+
+/* Son roulette : cliquetis accélérant → décélérant */
+function soundRoulette(duration) {
+  const ctx = getACtx();
+  let t = ctx.currentTime;
+  const end = t + duration;
+  /* densité de clics augmente au début puis diminue */
+  let interval = 0.04; // 25 Hz au départ
+  while (t < end) {
+    const progress = (t - ctx.currentTime) / duration;
+    /* easing : commence rapide (0.025s) → ralentit (0.18s) */
+    interval = 0.025 + 0.155 * Math.pow(progress, 0.7);
+
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type = 'square';
+    o.frequency.setValueAtTime(900 + Math.random()*300, t);
+    o.frequency.exponentialRampToValueAtTime(200 + Math.random()*100, t + 0.03);
+    g.gain.setValueAtTime(0.06 + Math.random()*0.03, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.035);
+    o.start(t); o.stop(t + 0.04);
+
+    t += interval;
+  }
+}
+
+/* Son choc boule */
+function soundClack(delay = 0) {
+  const ctx = getACtx();
+  const t = ctx.currentTime + delay;
+  for (let i = 0; i < 3; i++) {
+    const st = t + i * 0.1;
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type = 'sine';
+    o.frequency.setValueAtTime(700 - i*80, st);
+    o.frequency.exponentialRampToValueAtTime(220, st + 0.12);
+    g.gain.setValueAtTime(0.22, st);
+    g.gain.exponentialRampToValueAtTime(0.001, st + 0.16);
+    o.start(st); o.stop(st + 0.18);
+    /* bruit de surface */
+    const n = ctx.createOscillator();
+    const ng = ctx.createGain();
+    n.type = 'sawtooth';
+    n.frequency.value = 1400 + Math.random()*600;
+    n.connect(ng); ng.connect(ctx.destination);
+    ng.gain.setValueAtTime(0.04, st);
+    ng.gain.exponentialRampToValueAtTime(0.001, st + 0.04);
+    n.start(st); n.stop(st + 0.05);
+  }
+}
+
+/* Son sortie boule (glissement + atterrissage) */
+function soundBallExit() {
+  const ctx = getACtx();
+  const t = ctx.currentTime;
+  /* glissement */
+  const o1 = ctx.createOscillator();
+  const g1 = ctx.createGain();
+  o1.type = 'sine';
+  o1.frequency.setValueAtTime(200, t);
+  o1.frequency.exponentialRampToValueAtTime(700, t + .08);
+  o1.frequency.exponentialRampToValueAtTime(350, t + .25);
+  g1.gain.setValueAtTime(0.28, t);
+  g1.gain.exponentialRampToValueAtTime(0.001, t + .35);
+  o1.connect(g1); g1.connect(ctx.destination);
+  o1.start(t); o1.stop(t + .36);
+  /* chocs rebonds */
+  soundClack(.28);
+  soundClack(.52);
+}
+
+/* Fanfare finale */
+function soundFanfare() {
+  const ctx = getACtx();
+  const melody = [523,659,784,659,784,1047,784,1047];
+  melody.forEach((f, i) => {
+    const t = ctx.currentTime + i * .14;
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'triangle'; o.frequency.value = f;
+    g.gain.setValueAtTime(.2, t);
+    g.gain.exponentialRampToValueAtTime(.001, t + .18);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(t); o.stop(t + .2);
+  });
+}
+
+/* ═══════════════════════════════════════════════
+   ÉTOILES
+═══════════════════════════════════════════════ */
+function buildStars() {
+  const bg = document.getElementById('bgStars');
+  for (let i = 0; i < 90; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random() * 2.2 + .4;
+    s.style.cssText = `
+      width:${sz}px; height:${sz}px;
+      top:${Math.random()*100}%; left:${Math.random()*100}%;
+      --d:${1.2 + Math.random()*2.5}s;
+      animation-delay:${Math.random()*4}s;
+    `;
+    bg.appendChild(s);
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   URNE — mini boules
+═══════════════════════════════════════════════ */
+function renderUrnBalls() {
+  const c = document.getElementById('urnBalls');
+  c.innerHTML = '';
+  pool.forEach((ti, i) => {
+    const b = document.createElement('div');
+    b.className = 'ub';
+    b.style.setProperty('--dur', `${1.4 + i * .18}s`);
+    b.style.animationDelay = `${i * .15}s`;
+    /* abréger le nom pour tenir dans la mini-boule */
+    const name = TEAMS[ti];
+    const words = name.split(' ');
+    b.textContent = words.length > 1
+      ? words.map(w => w.slice(0,4)).join('\n')
+      : name.slice(0,5);
+    b.style.whiteSpace = 'pre';
+    c.appendChild(b);
+  });
+}
+
+/* ═══════════════════════════════════════════════
+   ROUE — Canvas
+═══════════════════════════════════════════════ */
+const canvas = document.getElementById('wheelCanvas');
+const wctx   = canvas.getContext('2d');
+let   wheelAngle = 0;
+let   wheelRAF   = null;
+
+function drawWheel(angle) {
+  const W = canvas.width, H = canvas.height;
+  const cx = W / 2, cy = H / 2, R = W / 2 - 3;
+  wctx.clearRect(0, 0, W, H);
+
+  const n   = pool.length;
+  if (n === 0) return;
+  const arc = (2 * Math.PI) / n;
+
+  pool.forEach((ti, i) => {
+    const a0 = angle + i * arc;
+    const a1 = a0 + arc;
+
+    /* secteur */
+    wctx.beginPath();
+    wctx.moveTo(cx, cy);
+    wctx.arc(cx, cy, R, a0, a1);
+    wctx.closePath();
+    wctx.fillStyle = WHEEL_COLORS[i % WHEEL_COLORS.length];
+    wctx.fill();
+
+    /* séparateur fin doré */
+    wctx.beginPath();
+    wctx.moveTo(cx, cy);
+    wctx.arc(cx, cy, R, a0, a1);
+    wctx.closePath();
+    wctx.strokeStyle = 'rgba(247,201,72,0.5)';
+    wctx.lineWidth = 1.5;
+    wctx.stroke();
+
+    /* label */
+    wctx.save();
+    wctx.translate(cx, cy);
+    wctx.rotate(a0 + arc / 2);
+    wctx.textAlign = 'right';
+    wctx.font = `bold ${n > 4 ? 10 : 12}px Quicksand, sans-serif`;
+    wctx.fillStyle = '#ffffff';
+    wctx.shadowColor = 'rgba(0,0,0,0.7)';
+    wctx.shadowBlur  = 4;
+    const label = TEAMS[ti].length > 10 ? TEAMS[ti].slice(0, 9) + '…' : TEAMS[ti];
+    wctx.fillText(label, R - 10, 4);
+    wctx.restore();
+  });
+
+  /* bouton central */
+  wctx.beginPath();
+  wctx.arc(cx, cy, 20, 0, Math.PI * 2);
+  wctx.fillStyle = '#000e22';
+  wctx.fill();
+  wctx.strokeStyle = '#f7c948';
+  wctx.lineWidth = 2;
+  wctx.stroke();
+
+  wctx.fillStyle = '#f7c948';
+  wctx.font = 'bold 13px Quicksand, sans-serif';
+  wctx.textAlign = 'center';
+  wctx.textBaseline = 'middle';
+  wctx.shadowBlur = 0;
+  wctx.fillText('✦', cx, cy);
+}
+
+/**
+ * Fait tourner la roue et s'arrête sur le secteur de l'équipe
+ * à l'index `slotIndex` dans le tableau `pool`.
+ *
+ * La logique :
+ *  - L'aiguille est fixée à midi (angle π/2 vers le haut = -π/2 en canvas)
+ *  - On veut que le milieu du secteur `slotIndex` pointe VERS l'aiguille
+ *  - Milieu du secteur i = startAngle + i*arc + arc/2
+ *  - On veut que : wheelAngle + slotIndex*arc + arc/2 ≡ -π/2 [2π]
+ *  - Donc l'angle cible final = -π/2 - slotIndex*arc - arc/2
+ *  - On ajoute N tours complets pour que la roue tourne assez
+ */
+function spinWheel(slotIndex, durationMs, onDone) {
+  const n   = pool.length;
+  const arc = (2 * Math.PI) / n;
+
+  /* angle où l'aiguille (midi = -π/2) rencontre le milieu du secteur */
+  const targetFinalAngle = -Math.PI / 2 - slotIndex * arc - arc / 2;
+
+  /* normaliser entre 0 et 2π */
+  const norm = ((targetFinalAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+
+  /* s'assurer qu'on tourne au moins 5 tours complets depuis l'angle actuel */
+  const currentNorm = ((wheelAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+  let   delta = norm - currentNorm;
+  if (delta <= 0) delta += 2 * Math.PI;          // toujours positif
+  const totalRot = 5 * 2 * Math.PI + delta;      // 5 tours + correction
+
+  const startAngle = wheelAngle;
+  const startTime  = performance.now();
+
+  function easeOut(t) {
+    /* courbe : accélération douce au départ, décélération lente */
+    return 1 - Math.pow(1 - t, 3.5);
+  }
+
+  function frame(now) {
+    const elapsed  = now - startTime;
+    const progress = Math.min(elapsed / durationMs, 1);
+    wheelAngle = startAngle + totalRot * easeOut(progress);
+    drawWheel(wheelAngle);
+
+    if (progress < 1) {
+      wheelRAF = requestAnimationFrame(frame);
+    } else {
+      wheelAngle = startAngle + totalRot; // valeur exacte
+      drawWheel(wheelAngle);
+      cancelAnimationFrame(wheelRAF);
+      onDone();
     }
+  }
+  wheelRAF = requestAnimationFrame(frame);
+}
 
-    function animateRoulette() {
-      const balls = document.querySelectorAll('.ball');
-      gsap.to(balls, {
-        rotation: 360 * 8 + Math.random() * 360,
-        duration: 4.5,
-        ease: "power2.inOut",
-        stagger: 0.05
-      });
+/* ═══════════════════════════════════════════════
+   TIRAGE PRINCIPAL
+═══════════════════════════════════════════════ */
+function doDraw() {
+  if (busy || pool.length === 0) return;
+  busy = true;
+  document.getElementById('btnDraw').disabled = true;
+  document.getElementById('status').textContent = '🎰 La roulette tourne…';
 
-      gsap.to(balls, {
-        x: () => Math.random() * 200 - 100,
-        y: () => Math.random() * 200 - 100,
-        duration: 4.5,
-        ease: "power2.inOut",
-        stagger: 0.05
-      });
-    }
+  /* Choisir une équipe au hasard parmi celles restantes */
+  const slotIndex = Math.floor(Math.random() * pool.length);
+  const teamIndex = pool[slotIndex];
 
-    async function drawOneBall() {
-      if (remainingTeams.length === 0 || isDrawing) return;
+  /* Sons roulette */
+  soundRoulette(3.4);
 
-      isDrawing = true;
-      drawBtn.disabled = true;
+  /* Animer la roue */
+  spinWheel(slotIndex, 3600, () => {
 
-      // Son de roulette
-      document.getElementById('rouletteSound').play();
+    /* Pause visuelle d'une seconde sur le résultat */
+    setTimeout(() => {
 
-      animateRoulette();
+      /* Retirer l'équipe du pool */
+      pool.splice(slotIndex, 1);
+      const position = drawOrder.length + 1;
+      drawOrder.push({ teamIndex, position });
 
-      // Attendre la fin de l'animation
-      await new Promise(resolve => setTimeout(resolve, 4800));
+      /* Son boule qui sort */
+      soundBallExit();
 
-      // Tirage aléatoire
-      const randomIndex = Math.floor(Math.random() * remainingTeams.length);
-      const selectedTeam = remainingTeams[randomIndex];
+      /* Afficher la grande boule */
+      showBigBall(TEAMS[teamIndex], position);
 
-      // Retirer l'équipe
-      remainingTeams.splice(randomIndex, 1);
+      /* Mettre à jour l'urne et la roue */
+      renderUrnBalls();
+      drawWheel(wheelAngle);
 
-      // Ajouter à l'ordre
-      order.push(selectedTeam);
-
-      // Animation de sortie de balle
-      document.getElementById('ballOutSound').play();
-
-      // Créer la ligne dans le résultat
-      const item = document.createElement('div');
-      item.className = 'order-item';
-      item.innerHTML = `
-        <div class="order-number">${order.length}</div>
-        <span>${selectedTeam}</span>
-      `;
-      orderList.appendChild(item);
-
-      // Animation d'apparition
-      gsap.from(item, {
-        opacity: 0,
-        x: -100,
-        duration: 0.8,
-        ease: "back.out(1.4)"
-      });
-
-      // Son de balle qui tombe
+      /* Ajouter au résultat avec délai pour la lecture */
       setTimeout(() => {
-        document.getElementById('ballHitSound').play();
-      }, 300);
+        addResult(TEAMS[teamIndex], position);
 
-      // Réinitialiser les boules restantes
-      if (remainingTeams.length > 0) {
-        createBalls();
-        drawBtn.textContent = `CONTINUER LE TIRAGE (${remainingTeams.length} restantes)`;
-        drawBtn.disabled = false;
-      } else {
-        drawBtn.textContent = "Tirage terminé !";
-        drawBtn.style.background = "linear-gradient(45deg, #00cc66, #33ff99)";
-      }
+        setTimeout(() => {
+          busy = false;
+          if (pool.length > 0) {
+            document.getElementById('btnDraw').disabled = false;
+            document.getElementById('status').textContent =
+              `${pool.length} équipe${pool.length > 1 ? 's' : ''} restante${pool.length > 1 ? 's' : ''}`;
+          } else {
+            /* Tirage terminé */
+            document.getElementById('btnDraw').style.display = 'none';
+            document.getElementById('btnReset').style.display = 'inline-block';
+            document.getElementById('finale').style.display = 'block';
+            document.getElementById('status').textContent = '';
+            soundFanfare();
+          }
+        }, 500);
+      }, 700);
 
-      isDrawing = false;
-    }
+    }, 1000);
+  });
+}
 
-    // Initialisation
-    function init() {
-      createBalls();
-      orderList.innerHTML = '';
-      remainingTeams = [...teams];
-      order = [];
-      drawBtn.textContent = "LANCER LE TIRAGE";
-      drawBtn.disabled = false;
-    }
+/* Affiche la grande boule animée */
+function showBigBall(name, pos) {
+  const ball = document.getElementById('bigBall');
+  const tag  = document.getElementById('orderTag');
 
-    drawBtn.addEventListener('click', drawOneBall);
+  tag.textContent = `Équipe n° ${pos}`;
+  tag.classList.remove('show');
 
-    // Lancement initial
-    window.onload = init;
-  </script>
+  ball.textContent = name;
+  ball.classList.remove('pop');
+  ball.style.opacity = '0';
+  ball.style.transform = 'scale(.3) translateY(50px)';
+
+  void ball.offsetWidth; // reflow
+
+  ball.classList.add('pop');
+  setTimeout(() => tag.classList.add('show'), 300);
+}
+
+/* Ajoute un élément dans la liste */
+function addResult(name, pos) {
+  const list = document.getElementById('results');
+  const item = document.createElement('div');
+  item.className = 'r-item';
+  item.innerHTML = `
+    <div class="r-pos">${pos}</div>
+    <div class="r-dot"></div>
+    <span class="r-name">${name}</span>
+  `;
+  list.appendChild(item);
+  requestAnimationFrame(() => requestAnimationFrame(() => item.classList.add('in')));
+}
+
+/* ═══════════════════════════════════════════════
+   RESET
+═══════════════════════════════════════════════ */
+function reset() {
+  pool      = TEAMS.map((_, i) => i);  // [0,1,2,3,4,5]
+  drawOrder = [];
+  busy      = false;
+
+  document.getElementById('results').innerHTML = '';
+  document.getElementById('finale').style.display  = 'none';
+  document.getElementById('btnDraw').style.display = 'inline-block';
+  document.getElementById('btnDraw').disabled      = false;
+  document.getElementById('btnReset').style.display = 'none';
+  document.getElementById('status').textContent =
+    '6 équipes dans l\'urne · Lancez le tirage !';
+
+  const tag  = document.getElementById('orderTag');
+  const ball = document.getElementById('bigBall');
+  tag.classList.remove('show');
+  ball.classList.remove('pop');
+  ball.style.opacity = '0';
+
+  renderUrnBalls();
+  drawWheel(wheelAngle);
+}
+
+/* ═══════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════ */
+document.getElementById('btnDraw').addEventListener('click', doDraw);
+document.getElementById('btnReset').addEventListener('click', reset);
+
+buildStars();
+reset(); // initialise pool et dessine tout
+</script>
 </body>
 </html>
